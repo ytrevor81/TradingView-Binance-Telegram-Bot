@@ -11,12 +11,11 @@ app = Flask(__name__)
 client = Client(config.SPOTTEST_API_KEY, config.SPOTTEST_SECRET_KEY) # Client object for executing orders on Binance API
 client.API_URL = 'https://testnet.binance.vision/api' #Test via Binance Spot Test API
 bot = Bot() #Handles all telegram communication
-#test_bot = telebot.TeleBot(config.TELEGRAM_BOT_KEY)
 
 
 ## ---- BINANCE API ---- ##
 def order(symbol, side, order_type, quantity):
-    ''' This function tests basic orders. More complex orders can be made by making additions and changes to the order_dictionary. '''
+    ''' Executes main orders '''
     try:
         order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'quantity': quantity, 'recvWindow': 10000}
         order = client.create_order(**order_dictionary)
@@ -77,7 +76,5 @@ def webhook_process():
                }
 
 #Asynchronous Running bot
-#polling_thread = threading.Thread(target=async_polling)
-#polling_thread.daemon = True
-#polling_thread.start()
-bot.async_polling()
+bot.initial_chat_id_check() #checks for the ID
+#bot.async_polling()

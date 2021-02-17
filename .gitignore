@@ -36,6 +36,9 @@ MANIFEST
 #Config Files
 config.py
 
+#Database
+db.sqlite
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
