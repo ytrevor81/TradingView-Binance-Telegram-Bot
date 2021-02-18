@@ -52,7 +52,7 @@ def order_message(order_response):
 
 
 ## ---- RECEIVE TRADINGVIEW WEBHOOK AND PLACE ORDER ---- ##
-@app.route('/atbwebhook', methods=['POST'])
+@app.route('/botwebhook', methods=['POST'])
 def webhook_process():
     data = json.loads(request.data) #Grabs JSON data sent from TradingView via webhook
 
@@ -74,7 +74,3 @@ def webhook_process():
             'code': "failed",
             'message': "Check console log for error"
                }
-
-#Asynchronous Running bot
-bot.initial_chat_id_check() #checks for the ID
-#bot.async_polling()
