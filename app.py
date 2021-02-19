@@ -3,9 +3,6 @@ from bot import Bot
 from binance.client import Client
 from flask import Flask, request, jsonify
 from binance.enums import *
-import telebot
-import threading
-
 
 app = Flask(__name__)
 client = Client(config.SPOTTEST_API_KEY, config.SPOTTEST_SECRET_KEY) # Client object for executing orders on Binance API
