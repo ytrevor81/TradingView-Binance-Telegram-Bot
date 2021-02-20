@@ -4,6 +4,7 @@ import telebot
 import threading
 import config
 import requests
+from message_filter_functions import *
 '''This is the complete Telegram bot. Trading functions are not included here'''
 
 class Bot(object):
@@ -13,6 +14,7 @@ class Bot(object):
         self.chat_id = None #will be assigned via message
         self.user_name_recorded = False
         self.ticker_link = 'https://api.binance.com/api/v3/ticker/price?symbol=' #need to add symbol to the end
+        self.general_error_message = "Incorrect syntax or symbol. Please see example below or see /help \n\n" # Add onto the end of this message the specific command syntax needed
 
         # ---- Initializing Functions --- #
         self.initial_chat_id_check() #checks if chat_id is already in the DB
@@ -77,18 +79,25 @@ class Bot(object):
             '''Makes only one order: /order {type} {side} {amount} {symbol}'''
             DB = Database()
             if self.correct_user(message, DB):
-                response = self.client.send_order(message)
-                bot.reply_to(message, response)
+                try:
+                    order_confirmation = self.client.send_order(message)
+                    bot.reply_to(message, order_confirmation)
+                except Exception as e:
+                    bot.reply_to(message, self.general_error_message + "ex. /order MARKET BUY 0.01 ETHUSDT or /order market buy 0.01 ethusdt")
 
         @bot.message_handler(commands=['ticker'])
         def current_price(message):
+            ''' Checks current price of a token '''
             DB = Database()
             if self.correct_user(message, DB):
-                token = message.text.replace("/ticker", "").replace(" ", "").upper()
-                link = self.ticker_link + token
-                request = requests.get(link)
-                data = request.json()
-                bot.reply_to(message, data['symbol'] + ": " + data['price'])
+                try:
+                    token = message.text.replace("/ticker", "").replace(" ", "").upper()
+                    link = self.ticker_link + token
+                    request = requests.get(link)
+                    data = request.json()
+                    bot.reply_to(message, data['symbol'] + ": " + data['price'])
+                except Exception as e:
+                    bot.reply_to(message, self.general_error_message + "ex. /ticker BTCUSDT or /ticker btcusdt")
 
         @bot.message_handler(commands=['strategy'])
         def show_strategy(message):
