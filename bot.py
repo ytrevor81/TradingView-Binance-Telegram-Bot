@@ -91,13 +91,17 @@ class Bot(object):
             DB = Database()
             if self.correct_user(message, DB):
                 try:
-                    token = message.text.replace("/ticker", "").replace(" ", "").upper()
+                    quick_token_text = message.text.replace("/ticker", "").replace(" ", "").upper()
+                    if "USDT" in quick_token_text:
+                        token = quick_token_text
+                    else:
+                        token = quick_token_text + "USDT"
                     link = self.ticker_link + token
                     request = requests.get(link)
                     data = request.json()
                     bot.reply_to(message, data['symbol'] + ": " + data['price'])
                 except Exception as e:
-                    bot.reply_to(message, self.general_error_message + "ex. /ticker BTCUSDT or /ticker btcusdt")
+                    bot.reply_to(message, self.general_error_message + "ex. /ticker btc or /ticker btcusdt")
 
         @bot.message_handler(commands=['strategy'])
         def show_strategy(message):
@@ -114,9 +118,44 @@ class Bot(object):
 
         @bot.message_handler(commands=['cancelorder'])
         def cancel_order(message):
+            ''' Cancel limit order: /cancelorder {symbol} {orderId}'''
             DB = Database()
             if self.correct_user(message, DB):
                 bot.reply_to(message, "Helloworld")
+
+        @bot.message_handler(commands=['orderhistory'])
+        def cancel_order(message):
+            ''' View order history: /orderhistory {symbol}'''
+            DB = Database()
+            if self.correct_user(message, DB):
+                quick_token_text = message.text.replace("/orderhistory", "").replace(" ", "").upper()
+                if "USDT" in quick_token_text:
+                    token = quick_token_text
+                else:
+                    token = quick_token_text + "USDT"
+                all_orders = self.client.see_all_orders(token)
+                bot.reply_to(message, str(all_orders))
+
+        @bot.message_handler(commands=['openorders'])
+        def cancel_order(message):
+            ''' View order history: /openorders {symbol}'''
+            DB = Database()
+            if self.correct_user(message, DB):
+                quick_token_text = message.text.replace("/openorders", "").replace(" ", "").upper()
+                if "USDT" in quick_token_text:
+                    token = quick_token_text
+                else:
+                    token = quick_token_text + "USDT"
+                open_orders = self.client.open_orders(token)
+                bot.reply_to(message, str(open_orders))
+
+        @bot.message_handler(commands=['cancel'])
+        def cancel_order(message):
+            '''Cancels an order /cancel {symbol} {orderId}'''
+            DB = Database()
+            if self.correct_user(message, DB):
+                cancelled_order = self.client.cancel_order(message)
+                bot.reply_to(message, str(cancelled_order))
 
         @bot.message_handler(commands=['cancelwatch'])
         def cancel_order(message):
