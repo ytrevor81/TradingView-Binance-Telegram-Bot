@@ -8,45 +8,50 @@ class Binance(object):
         self.client = Client(api_key, secret_key)
         self.client.API_URL = 'https://testnet.binance.vision/api' #only for testing
 
-        # ---- Account Info Commands --- #
+    # ---- Account Info Commands --- #
     def get_account(self):
         ''' Returns account info '''
         account_info = self.client.get_account()
         return account_info
-        # ---- ---- #
+    # ---- ---- #
 
     # ---- Order Commands ---- #
     def send_order(self, message):
-        order_params = order_message_filter(message)
-        order_type = order_params[0]
-        side = order_params[1]
-        quantity = order_params[2]
-        symbol = order_params[3]
-        if len(order_params) > 4: #a long list means that the order is a limit order, not a market order
-            price = order_params[4]
-            order_response = self.order(symbol, side, order_type, 'GTC', quantity, price)
-        else:
-            order_response = self.order(symbol, side, order_type, "None", quantity, 0)
+        raw_message = message.text
+        if "limit" in raw_message or 'LIMIT' in raw_message:
+            order_params = limit_order_message_filter(raw_message)
+            order_response = self.limit_order(order_params[0], order_params[1], order_params[2], order_params[3], order_params[4], order_params[5])
+        elif 'market' in raw_message or 'MARKET' in raw_message:
+            order_params = market_order_message_filter(raw_message)
+            order_response = self.market_order(order_params[0], order_params[1], order_params[2], order_params[3])
         print(order_response)
-        order_message = order_message(order_response) #Telegram message sent to user
-        return order_message
+        order_confirmation = order_message(order_response) #Telegram message sent to user
+        return order_confirmation
 
-    def order(self, symbol, side, order_type, timeInForce, quantity, price):
-        ''' Executes main orders/Depending on type of order commands '''
+    def market_order(self, symbol, side, order_type, quantity):
+        ''' Executes market orders/Depending on type of order commands '''
         try:
-            if price == 0 and timeInForce == "None": #If price == 0, that means the order is a market order
-                order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'quantity': quantity, 'recvWindow': 10000}
-            else:
-                order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'timeInForce': timeInForce, 'quantity': quantity, 'price': price, 'recvWindow': 10000}
+            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'quantity': quantity, 'recvWindow': 10000}
             order = self.client.create_order(**order_dictionary)
         except Exception as e:
             print("something went wrong - {}".format(e))
-            bot.error_message(symbol, quantity, str(e))
+            #bot.error_message(symbol, quantity, str(e))
+            return False
+
+        return order
+
+    def limit_order(self, symbol, side, order_type, timeInForce, quantity, price):
+        ''' Executes limit orders/Depending on type of order commands '''
+        try:
+            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'timeInForce': timeInForce, 'quantity': quantity, 'price': price, 'recvWindow': 10000}
+            order = self.client.create_order(**order_dictionary)
+        except Exception as e:
+            print("something went wrong - {}".format(e))
+            #bot.error_message(symbol, quantity, str(e))
             return False
 
         return order
     # ---- ---- #
-
 
     # ---- Check Orders Commands --- #
     def see_all_orders(self, symbol):

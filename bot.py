@@ -75,14 +75,15 @@ class Bot(object):
                 bot.reply_to(message, "Helloworld")
 
         @bot.message_handler(commands=['order'])
-        def set_strategy(message):
-            '''Makes only one order: /order {type} {side} {amount} {symbol}'''
+        def make_order(message):
+            '''Makes only one order: /order {market} {side} {amount} {symbol} OR /order {limit} {GTC/IOC/FOK} {side} {amount} {symbol} at {price}'''
             DB = Database()
             if self.correct_user(message, DB):
                 try:
                     order_confirmation = self.client.send_order(message)
                     bot.reply_to(message, order_confirmation)
                 except Exception as e:
+                    print(str(e))
                     bot.reply_to(message, self.general_error_message + "ex. /order MARKET BUY 0.01 ETHUSDT or /order market buy 0.01 ethusdt")
 
         @bot.message_handler(commands=['ticker'])
@@ -114,17 +115,10 @@ class Bot(object):
             '''Send alert when price of a token'''
             DB = Database()
             if self.correct_user(message, DB):
-                bot.reply_to(message, "Helloworld")
-
-        @bot.message_handler(commands=['cancelorder'])
-        def cancel_order(message):
-            ''' Cancel limit order: /cancelorder {symbol} {orderId}'''
-            DB = Database()
-            if self.correct_user(message, DB):
-                bot.reply_to(message, "Helloworld")
+                bot.reply_to(0, "Helloworld")
 
         @bot.message_handler(commands=['orderhistory'])
-        def cancel_order(message):
+        def show_order_history(message):
             ''' View order history: /orderhistory {symbol}'''
             DB = Database()
             if self.correct_user(message, DB):
@@ -137,7 +131,7 @@ class Bot(object):
                 bot.reply_to(message, str(all_orders))
 
         @bot.message_handler(commands=['openorders'])
-        def cancel_order(message):
+        def show_open_orders(message):
             ''' View order history: /openorders {symbol}'''
             DB = Database()
             if self.correct_user(message, DB):
@@ -156,19 +150,6 @@ class Bot(object):
             if self.correct_user(message, DB):
                 cancelled_order = self.client.cancel_order(message)
                 bot.reply_to(message, str(cancelled_order))
-
-        @bot.message_handler(commands=['cancelwatch'])
-        def cancel_order(message):
-            '''Stops alert set by /watch'''
-            DB = Database()
-            if self.correct_user(message, DB):
-                bot.reply_to(message, "Helloworld")
-
-        @bot.message_handler(commands=['cancelstrategy'])
-        def cancel_strategy(message):
-            DB = Database()
-            if self.correct_user(message, DB):
-                bot.reply_to(message, "Helloworld")
 
         @bot.message_handler(commands=['account'])
         def show_account(message):
