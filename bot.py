@@ -74,17 +74,41 @@ class Bot(object):
             if self.correct_user(message, DB):
                 bot.reply_to(message, "Helloworld")
 
-        @bot.message_handler(commands=['order'])
-        def make_order(message):
-            '''Makes only one order: /order {market} {side} {amount} {symbol} OR /order {limit} {GTC/IOC/FOK} {side} {amount} {symbol} at {price}'''
+        @bot.message_handler(commands=['market'])
+        def make_market_order(message):
+            '''Market order: /market {side} {amount} {symbol}'''
             DB = Database()
             if self.correct_user(message, DB):
                 try:
-                    order_confirmation = self.client.send_order(message)
+                    order_confirmation = self.client.send_order("market", message)
                     bot.reply_to(message, order_confirmation)
                 except Exception as e:
                     print(str(e))
-                    bot.reply_to(message, self.general_error_message + "ex. /order MARKET BUY 0.01 ETHUSDT or /order market buy 0.01 ethusdt")
+                    bot.reply_to(message, self.general_error_message + "ex. /market buy 0.01 eth \n(/market {side} {amount} {symbol})")
+
+        @bot.message_handler(commands=['limit'])
+        def make_limit_order(message):
+            '''Limit order: /limit {timeInForce} {side} {amount} {symbol} at {price}'''
+            DB = Database()
+            if self.correct_user(message, DB):
+                try:
+                    order_confirmation = self.client.send_order("limit", message)
+                    bot.reply_to(message, order_confirmation)
+                except Exception as e:
+                    print(str(e))
+                    bot.reply_to(message, self.general_error_message + "ex. /limit gtc sell 0.01 ethusdt at 1858 \n(/limit {timeInForce} {side} {amount} {symbol} at {price})")
+
+        @bot.message_handler(commands=['stoploss'])
+        def make_stoploss_order(message):
+            '''Makes only one order: /stoploss {timeInForce} {side} {amount} {symbol} at {price} stop at {stopLoss}'''
+            DB = Database()
+            if self.correct_user(message, DB):
+                try:
+                    order_confirmation = self.client.send_order("stoploss", message)
+                    bot.reply_to(message, order_confirmation)
+                except Exception as e:
+                    print(str(e))
+                    bot.reply_to(message, self.general_error_message + "ex. /stoploss gtc sell 0.1 btc at 55000 stop at 56000\n (/stoploss {timeInForce} {side} {amount} {symbol} at {price} stop at {stopLoss})")
 
         @bot.message_handler(commands=['ticker'])
         def current_price(message):
@@ -104,12 +128,6 @@ class Bot(object):
                 except Exception as e:
                     bot.reply_to(message, self.general_error_message + "ex. /ticker btc or /ticker btcusdt")
 
-        @bot.message_handler(commands=['strategy'])
-        def show_strategy(message):
-            DB = Database()
-            if self.correct_user(message, DB):
-                bot.reply_to(message, "Helloworld")
-
         @bot.message_handler(commands=['watch'])
         def show_strategy(message):
             '''Send alert when price of a token'''
@@ -119,16 +137,13 @@ class Bot(object):
 
         @bot.message_handler(commands=['orderhistory'])
         def show_order_history(message):
-            ''' View order history: /orderhistory {symbol}'''
+            ''' View order history: /orderhistory
+            Sends a csv of their past orders'''
             DB = Database()
             if self.correct_user(message, DB):
-                quick_token_text = message.text.replace("/orderhistory", "").replace(" ", "").upper()
-                if "USDT" in quick_token_text:
-                    token = quick_token_text
-                else:
-                    token = quick_token_text + "USDT"
-                all_orders = self.client.see_all_orders(token)
-                bot.reply_to(message, str(all_orders))
+                #all_orders = self.client.see_all_orders(token)
+                #bot.reply_to(message, str(all_orders))
+                pass
 
         @bot.message_handler(commands=['openorders'])
         def show_open_orders(message):
@@ -149,7 +164,8 @@ class Bot(object):
             DB = Database()
             if self.correct_user(message, DB):
                 cancelled_order = self.client.cancel_order(message)
-                bot.reply_to(message, str(cancelled_order))
+                cancel_message = cancelled_message(cancelled_order)
+                bot.reply_to(message, cancel_message)
 
         @bot.message_handler(commands=['account'])
         def show_account(message):
@@ -158,11 +174,6 @@ class Bot(object):
                 info = self.client.get_account()
                 bot.reply_to(message, str(info))
 
-        @bot.message_handler(commands=['orderbook'])
-        def show_orderbook(message):
-            DB = Database()
-            if self.correct_user(message, DB):
-                bot.reply_to(message, "Helloworld")
     # ----  ---- #
 
     # ---- Async Polling Setup ---- #

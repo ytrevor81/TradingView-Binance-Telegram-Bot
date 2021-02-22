@@ -16,22 +16,25 @@ class Binance(object):
     # ---- ---- #
 
     # ---- Order Commands ---- #
-    def send_order(self, message):
+    def send_order(self, order_type, message):
         raw_message = message.text
-        if "limit" in raw_message or 'LIMIT' in raw_message:
+        if order_type == "limit":
             order_params = limit_order_message_filter(raw_message)
             order_response = self.limit_order(order_params[0], order_params[1], order_params[2], order_params[3], order_params[4], order_params[5])
-        elif 'market' in raw_message or 'MARKET' in raw_message:
+        elif order_type == "market":
             order_params = market_order_message_filter(raw_message)
             order_response = self.market_order(order_params[0], order_params[1], order_params[2], order_params[3])
+        elif order_type =="stoploss":
+            order_params = stoploss_order_message_filter(raw_message)
+            order_response = self.stoploss_order(order_params[0], order_params[1], order_params[2], order_params[3], order_params[4], order_params[5], order_params[6])
         print(order_response)
-        order_confirmation = order_message(order_response) #Telegram message sent to user
+        order_confirmation = stopLoss_message(order_response) #Telegram message sent to user
         return order_confirmation
 
     def market_order(self, symbol, side, order_type, quantity):
         ''' Executes market orders/Depending on type of order commands '''
         try:
-            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'quantity': quantity, 'recvWindow': 10000}
+            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'quantity': quantity, 'recvWindow': 5000}
             order = self.client.create_order(**order_dictionary)
         except Exception as e:
             print("something went wrong - {}".format(e))
@@ -43,7 +46,18 @@ class Binance(object):
     def limit_order(self, symbol, side, order_type, timeInForce, quantity, price):
         ''' Executes limit orders/Depending on type of order commands '''
         try:
-            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'timeInForce': timeInForce, 'quantity': quantity, 'price': price, 'recvWindow': 10000}
+            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'timeInForce': timeInForce, 'quantity': quantity, 'price': price, 'recvWindow': 5000}
+            order = self.client.create_order(**order_dictionary)
+        except Exception as e:
+            print("something went wrong - {}".format(e))
+            #bot.error_message(symbol, quantity, str(e))
+            return False
+
+        return order
+
+    def stoploss_order(self, symbol, side, order_type, timeInForce, quantity, price, stopPrice):
+        try:
+            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'timeInForce': timeInForce, 'quantity': quantity, 'price': price, 'stopPrice': stopPrice, 'recvWindow': 5000}
             order = self.client.create_order(**order_dictionary)
         except Exception as e:
             print("something went wrong - {}".format(e))
