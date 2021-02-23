@@ -8,11 +8,13 @@ class Binance(object):
     def __init__(self, api_key, secret_key):
         self.client = Client(api_key, secret_key)
         self.client.API_URL = 'https://testnet.binance.vision/api' #only for testing
+        #self.recvWindow = self.get_recvWindow(self.client)
 
     # ---- Account Info Commands --- #
     def get_account(self):
         ''' Returns account info '''
-        account_info = self.client.get_account()
+        recvWindow = { 'recvWindow': 59999 }
+        account_info = self.client.get_account(**recvWindow)
         return account_info
     # ---- ---- #
 
@@ -37,7 +39,7 @@ class Binance(object):
     def market_order(self, symbol, side, order_type, quantity):
         ''' Executes market orders/Depending on type of order commands '''
         try:
-            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'quantity': quantity, 'recvWindow': 5000}
+            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'quantity': quantity, 'recvWindow': 59999}
             order = self.client.create_order(**order_dictionary)
         except Exception as e:
             print("something went wrong - {}".format(e))
@@ -49,7 +51,7 @@ class Binance(object):
     def limit_order(self, symbol, side, order_type, timeInForce, quantity, price):
         ''' Executes limit orders/Depending on type of order commands '''
         try:
-            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'timeInForce': timeInForce, 'quantity': quantity, 'price': price, 'recvWindow': 5000}
+            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'timeInForce': timeInForce, 'quantity': quantity, 'price': price, 'recvWindow': 59999}
             order = self.client.create_order(**order_dictionary)
         except Exception as e:
             print("something went wrong - {}".format(e))
@@ -60,7 +62,7 @@ class Binance(object):
 
     def stoploss_order(self, symbol, side, order_type, timeInForce, quantity, price, stopPrice):
         try:
-            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'timeInForce': timeInForce, 'quantity': quantity, 'price': price, 'stopPrice': stopPrice, 'recvWindow': 5000}
+            order_dictionary = {'symbol': symbol, 'side': side, 'type': order_type, 'timeInForce': timeInForce, 'quantity': quantity, 'price': price, 'stopPrice': stopPrice, 'recvWindow': 59999}
             order = self.client.create_order(**order_dictionary)
         except Exception as e:
             print("something went wrong - {}".format(e))
@@ -73,7 +75,7 @@ class Binance(object):
     # ---- Check Orders Commands --- #
     def see_all_orders(self, symbol):
         try:
-            dict = {'symbol': symbol}
+            dict = { 'symbol': symbol, 'recvWindow': 59999 }
             all_orders = self.client.get_all_orders(**dict)
             return all_orders
         except Exception as e:
@@ -82,7 +84,7 @@ class Binance(object):
 
     def open_orders(self, symbol):
         try:
-            dict = {'symbol': symbol}
+            dict = { 'symbol': symbol, 'recvWindow': 59999 }
             open_orders = self.client.get_open_orders(**dict)
             print(open_orders)
             return open_orders
@@ -95,7 +97,7 @@ class Binance(object):
     def cancel_order(self, message):
         try:
             cancel_order_params = cancel_order_message_filter(message)
-            dict = {'symbol': cancel_order_params[0], 'orderId': cancel_order_params[1]}
+            dict = { 'symbol': cancel_order_params[0], 'orderId': cancel_order_params[1], "recvWindow": 59999 }
             response = self.client.cancel_order(**dict)
             print(response)
             return response

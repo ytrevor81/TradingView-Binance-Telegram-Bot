@@ -153,29 +153,37 @@ class Bot(object):
                     bot.send_document(self.chat_id, doc)
                 except Exception as e:
                     print(str(e))
-                    bot.reply_to(message, self.general_error_message + "ex. /orderhistory btc \n\n Also make sure that you have made orders in the past using the token in question")
+                    bot.reply_to(message, self.general_error_message + "ex. /orderhistory btc \n\n/orderhistory {symbol}\n\nAlso make sure that you have made orders in the past using the token in question")
 
         @bot.message_handler(commands=['openorders'])
         def show_open_orders(message):
             ''' View order history: /openorders {symbol}'''
             DB = Database()
             if self.correct_user(message, DB):
-                quick_token_text = message.text.replace("/openorders", "").replace(" ", "").upper()
-                if "USDT" in quick_token_text:
-                    token = quick_token_text
-                else:
-                    token = quick_token_text + "USDT"
-                open_orders = self.client.open_orders(token)
-                bot.reply_to(message, str(open_orders))
+                try:
+                    quick_token_text = message.text.replace("/openorders", "").replace(" ", "").upper()
+                    if "USDT" in quick_token_text:
+                        token = quick_token_text
+                    else:
+                        token = quick_token_text + "USDT"
+                    open_orders = self.client.open_orders(token)
+                    self.open_orders_message_chain(open_orders, bot, token)
+                except Exception as e:
+                    print(str(e))
+                    bot.reply_to(message, self.general_error_message + "ex. /openorders eth\n\n/openorders {symbol}\n\nAlso make sure that you have made orders in the past using the token in question")
 
         @bot.message_handler(commands=['cancel'])
         def cancel_order(message):
             '''Cancels an order /cancel {symbol} {orderId}'''
             DB = Database()
             if self.correct_user(message, DB):
-                cancelled_order = self.client.cancel_order(message)
-                cancel_message = cancelled_message(cancelled_order)
-                bot.reply_to(message, cancel_message)
+                try:
+                    cancelled_order = self.client.cancel_order(message)
+                    cancel_message = cancelled_message(cancelled_order)
+                    bot.reply_to(message, cancel_message)
+                except Exception as e:
+                    print(str(e))
+                    bot.reply_to(message, self.general_error_message + "ex. /cancel eth 6963\n\n/cancel {symbol} {order Id}\n\n")
 
         @bot.message_handler(commands=['account'])
         def show_account(message):
@@ -221,6 +229,16 @@ class Bot(object):
                                  order['icebergQty'],
                                  order['origQuoteOrderQty']])
         self.csv_file_name = filename
+    # ---- ---- #
+
+    # ---- Open Orders Message Chain ---- #
+    def open_orders_message_chain(self, open_orders_list, bot, token):
+        if len(open_orders_list) > 0:
+            for order in open_orders_list:
+                telegram_message = f"Order ID: {order['orderId']}\n" + f"Symbol: {order['symbol']}\n" + f"Price: {order['price']}\n" + f"Original Quantity: {order['origQty']}\n" + f"Executed Quantity: {order['executedQty']}\n" + f"Status: {order['status']}\n" + f"Type: {order['type']}\n" + f"Side: {order['side']}\n" + f"Time In Force: {order['timeInForce']}\n" + f"Stop Price: {order['stopPrice']}"
+                bot.send_message(self.chat_id, telegram_message)
+        else:
+            bot.send_message(self.chat_id, "You have no open orders for " + token)
     # ---- ---- #
 
     # ---- Async Polling Setup ---- #

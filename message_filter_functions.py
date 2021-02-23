@@ -20,7 +20,7 @@ def market_order_message_filter(message):
 
 def limit_order_message_filter(message):
     ''' Returns a list of all order parameters: [symbol, side, order_type, timeInForce, quantity, price]
-    /order {type} {timeInForce} {side} {amount} {symbol} at {price}   /order limit gtc sell 1000 at 0.59'''
+    /limit {type} {timeInForce} {side} {amount} {symbol} at {price}   /limit gtc sell 1000 xrp at 0.59'''
     try:
         strip_command = message.replace("/limit ", "").replace("at ", "").upper()
         order_params = strip_command.split()
@@ -96,20 +96,21 @@ def stopLoss_message(order_response):
     return telegram_message
 
 def cancelled_message(order_response):
-    orderId = order_response["orderId"]
-    symbol = order_response["symbol"]
-    clientOrderId = order_response["clientOrderId"]
-    origQty = order_response["origQty"]
-    executedQty = order_response["executedQty"]
-    status = order_response["status"]
-    cummulativeQuoteQty = order_response["cummulativeQuoteQty"]
-    type = order_response["type"]
-    side = order_response["side"]
-    timeInForce = order_response["timeInForce"]
-    stopPrice = order_response["stopPrice"]
+    try:
+        orderId = order_response["orderId"]
+        symbol = order_response["symbol"]
+        price = order_response["price"]
+        origQty = order_response["origQty"]
+        executedQty = order_response["executedQty"]
+        status = order_response["status"]
+        type = order_response["type"]
+        side = order_response["side"]
+        timeInForce = order_response["timeInForce"]
 
-    telegram_message = f"Status: {status}\n" + f"Order ID: {orderId}\n" + f"Symbol: {symbol}\n" + f"Client Order ID: {clientOrderId}\n" + f"Original Quantity ID: {origQty}\n" + f"Executed Quantity ID: {executedQty}\n" + f"Cummulative Quote Quantity ID: {cummulativeQuoteQty}\n" + f"Type: {type}\n" + f"Side: {side}\n" + f"Time In Force: {timeInForce}\n" + f"Stop Price: {stopPrice}"
-    return telegram_message
+        telegram_message = f"Status: {status}\n" + f"Order ID: {orderId}\n" + f"Symbol: {symbol}\n" + f"Price: {price}\n" + f"Original Quantity ID: {origQty}\n" + f"Executed Quantity ID: {executedQty}\n" + f"Type: {type}\n" + f"Side: {side}\n" + f"Time In Force: {timeInForce}\n"
+        return telegram_message
+    except Exception as e:
+        print(e)
 
 def cancel_order_message_filter(message):
     ''' Returns a list of all cancel_order parameters: [symbol, orderId]
