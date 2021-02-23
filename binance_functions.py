@@ -2,6 +2,7 @@ from flask import request, jsonify
 from binance.enums import *
 from binance.client import Client
 from message_filter_functions import *
+import csv
 
 class Binance(object):
     def __init__(self, api_key, secret_key):
@@ -21,14 +22,16 @@ class Binance(object):
         if order_type == "limit":
             order_params = limit_order_message_filter(raw_message)
             order_response = self.limit_order(order_params[0], order_params[1], order_params[2], order_params[3], order_params[4], order_params[5])
+            order_confirmation = order_message(order_response) #Telegram message sent to user
         elif order_type == "market":
             order_params = market_order_message_filter(raw_message)
             order_response = self.market_order(order_params[0], order_params[1], order_params[2], order_params[3])
+            order_confirmation = order_message(order_response) #Telegram message sent to user
         elif order_type =="stoploss":
             order_params = stoploss_order_message_filter(raw_message)
             order_response = self.stoploss_order(order_params[0], order_params[1], order_params[2], order_params[3], order_params[4], order_params[5], order_params[6])
+            order_confirmation = stopLoss_message(order_response) #Telegram message sent to user
         print(order_response)
-        order_confirmation = stopLoss_message(order_response) #Telegram message sent to user
         return order_confirmation
 
     def market_order(self, symbol, side, order_type, quantity):
@@ -72,7 +75,6 @@ class Binance(object):
         try:
             dict = {'symbol': symbol}
             all_orders = self.client.get_all_orders(**dict)
-            print(all_orders)
             return all_orders
         except Exception as e:
             print(str(e))

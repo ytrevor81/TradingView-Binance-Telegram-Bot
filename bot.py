@@ -1,9 +1,6 @@
 from db_functions import Database
 from binance_functions import Binance
-import telebot
-import threading
-import config
-import requests
+import telebot, threading, config, requests, csv, os, time
 from message_filter_functions import *
 '''This is the complete Telegram bot. Trading functions are not included here'''
 
@@ -15,7 +12,7 @@ class Bot(object):
         self.user_name_recorded = False
         self.ticker_link = 'https://api.binance.com/api/v3/ticker/price?symbol=' #need to add symbol to the end
         self.general_error_message = "Incorrect syntax or symbol. Please see example below or see /help \n\n" # Add onto the end of this message the specific command syntax needed
-
+        self.csv_file_name = None #this will automatically delete any csv file called on /orderhistory
         # ---- Initializing Functions --- #
         self.initial_chat_id_check() #checks if chat_id is already in the DB
         self.polling_thread = threading.Thread(target=self.all_bot_actions) #The bot will be polling for messages asynchronously as the rest of the app runs
@@ -141,9 +138,22 @@ class Bot(object):
             Sends a csv of their past orders'''
             DB = Database()
             if self.correct_user(message, DB):
-                #all_orders = self.client.see_all_orders(token)
-                #bot.reply_to(message, str(all_orders))
-                pass
+                try:
+                    if self.csv_file_name != None:
+                        os.remove(self.csv_file_name) #Deletes file once sent
+                        self.csv_file_name = None
+                    quick_token_text = message.text.replace("/orderhistory", "").replace(" ", "").upper()
+                    if "USDT" in quick_token_text:
+                        token = quick_token_text
+                    else:
+                        token = quick_token_text + "USDT"
+                    all_orders = self.client.see_all_orders(token)
+                    self.order_history_csv(token, all_orders)
+                    doc = open(self.csv_file_name, 'rb')
+                    bot.send_document(self.chat_id, doc)
+                except Exception as e:
+                    print(str(e))
+                    bot.reply_to(message, self.general_error_message + "ex. /orderhistory btc \n\n Also make sure that you have made orders in the past using the token in question")
 
         @bot.message_handler(commands=['openorders'])
         def show_open_orders(message):
@@ -175,6 +185,43 @@ class Bot(object):
                 bot.reply_to(message, str(info))
 
     # ----  ---- #
+
+    # ---- Order History CSV ---- #
+    def order_history_csv(self, token, order_history):
+        filename = token + "_Order_History.csv"
+        with open(filename, 'w') as f:
+            writer = csv.writer(f)
+            writer.writerow(['Order ID',
+                             'Client Order ID',
+                             'Price',
+                             'Original Quantity',
+                             'Executed Quantity',
+                             'Cummulative Quote Quantity',
+                             'Status',
+                             'Time In Force',
+                             'Type',
+                             'Side',
+                             'Stop Price',
+                             'Iceberg Quantity',
+                             'Original Quote Order Quantity'])
+        with open(filename, 'a') as f:
+            writer = csv.writer(f)
+            for order in order_history:
+                writer.writerow([order['orderId'],
+                                 order['clientOrderId'],
+                                 order['price'],
+                                 order['origQty'],
+                                 order['executedQty'],
+                                 order['cummulativeQuoteQty'],
+                                 order['status'],
+                                 order['timeInForce'],
+                                 order['type'],
+                                 order['side'],
+                                 order['stopPrice'],
+                                 order['icebergQty'],
+                                 order['origQuoteOrderQty']])
+        self.csv_file_name = filename
+    # ---- ---- #
 
     # ---- Async Polling Setup ---- #
     def all_bot_actions(self):
