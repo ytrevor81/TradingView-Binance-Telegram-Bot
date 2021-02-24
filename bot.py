@@ -1,6 +1,6 @@
 from db_functions import Database
 from binance_functions import Binance
-import telebot, threading, config, requests, csv, os, time
+import telebot, threading, config, requests, csv, os
 from message_filter_functions import *
 '''This is the complete Telegram bot. Trading functions are not included here'''
 
@@ -13,6 +13,8 @@ class Bot(object):
         self.ticker_link = 'https://api.binance.com/api/v3/ticker/price?symbol=' #need to add symbol to the end
         self.general_error_message = "Incorrect syntax or symbol. Please see example below or see /help \n\n" # Add onto the end of this message the specific command syntax needed
         self.csv_file_name = None #this will automatically delete any csv file called on /orderhistory
+        self.block_tradingview = False #if True, TradingView orders will be blocked
+
         # ---- Initializing Functions --- #
         self.initial_chat_id_check() #checks if chat_id is already in the DB
         self.polling_thread = threading.Thread(target=self.all_bot_actions) #The bot will be polling for messages asynchronously as the rest of the app runs
@@ -62,14 +64,8 @@ class Bot(object):
         def bot_info(message):
             DB = Database()
             if self.correct_user(message, DB):
-                bot.reply_to(message, "Helloworld")
-
-        @bot.message_handler(commands=['set'])
-        def set_strategy(message):
-            '''Sets a strategy for multiple orders: /set {side} {amount} {symbol} at {price}, then {side} {amount} {symbol} at {price}'''
-            DB = Database()
-            if self.correct_user(message, DB):
-                bot.reply_to(message, "Helloworld")
+                help = help_message()
+                bot.reply_to(message, help)
 
         @bot.message_handler(commands=['market'])
         def make_market_order(message):
@@ -81,7 +77,7 @@ class Bot(object):
                     bot.reply_to(message, order_confirmation)
                 except Exception as e:
                     print(str(e))
-                    bot.reply_to(message, self.general_error_message + "ex. /market buy 0.01 eth \n(/market {side} {amount} {symbol})")
+                    bot.reply_to(message, self.general_error_message + "ex. /market buy 0.01 eth \n\n/market {side} {amount} {symbol}")
 
         @bot.message_handler(commands=['limit'])
         def make_limit_order(message):
@@ -93,7 +89,7 @@ class Bot(object):
                     bot.reply_to(message, order_confirmation)
                 except Exception as e:
                     print(str(e))
-                    bot.reply_to(message, self.general_error_message + "ex. /limit gtc sell 0.01 ethusdt at 1858 \n(/limit {timeInForce} {side} {amount} {symbol} at {price})")
+                    bot.reply_to(message, self.general_error_message + "ex. /limit gtc sell 0.01 ethusdt at 1858 \n\n/limit {timeInForce} {side} {amount} {symbol} at {price}")
 
         @bot.message_handler(commands=['stoploss'])
         def make_stoploss_order(message):
@@ -105,7 +101,7 @@ class Bot(object):
                     bot.reply_to(message, order_confirmation)
                 except Exception as e:
                     print(str(e))
-                    bot.reply_to(message, self.general_error_message + "ex. /stoploss gtc sell 0.1 btc at 55000 stop at 56000\n (/stoploss {timeInForce} {side} {amount} {symbol} at {price} stop at {stopLoss})")
+                    bot.reply_to(message, self.general_error_message + "ex. /stoploss gtc sell 0.1 btc at 55000 stop at 56000\n\n /stoploss {timeInForce} {side} {amount} {symbol} at {price} stop at {stopLoss}")
 
         @bot.message_handler(commands=['ticker'])
         def current_price(message):
@@ -124,13 +120,6 @@ class Bot(object):
                     bot.reply_to(message, data['symbol'] + ": " + data['price'])
                 except Exception as e:
                     bot.reply_to(message, self.general_error_message + "ex. /ticker btc or /ticker btcusdt")
-
-        @bot.message_handler(commands=['watch'])
-        def show_strategy(message):
-            '''Send alert when price of a token'''
-            DB = Database()
-            if self.correct_user(message, DB):
-                bot.reply_to(0, "Helloworld")
 
         @bot.message_handler(commands=['orderhistory'])
         def show_order_history(message):
@@ -191,6 +180,34 @@ class Bot(object):
             if self.correct_user(message, DB):
                 info = self.client.get_account()
                 bot.reply_to(message, str(info))
+
+        @bot.message_handler(commands=['block'])
+        def block_tradingview_orders(message):
+            ''' Temporarily blocks tradingview orders '''
+            DB = Database()
+            if self.correct_user(message, DB):
+                if self.block_tradingview:
+                    bot.reply_to(message, "TradingView orders are already blocked. /unblock to continue TradingView orders")
+                else:
+                    self.block_tradingview = True
+                    bot.reply_to(message, "TradingView orders are now blocked. /unblock to continue TradingView orders")
+
+        @bot.message_handler(commands=['unblock'])
+        def unblock_tradingview_orders(message):
+            ''' Unblocks tradingview orders '''
+            DB = Database()
+            if self.correct_user(message, DB):
+                if self.block_tradingview:
+                    self.block_tradingview = False
+                    bot.reply_to(message, "TradingView orders ready to continue. /block to block TradingView orders")
+                else:
+                    bot.reply_to(message, "TradingView orders are currently active. /block to block TradingView orders")
+
+        @bot.message_handler(commands=['testkill'])
+        def kill_app(message):
+            ''' ONLY FOR LOCAL HOST TESTING '''
+            bot.reply_to(0, message)
+
 
     # ----  ---- #
 
@@ -253,4 +270,5 @@ class Bot(object):
     def stop_async_polling(self):
         self.polling_thread.join()
         self.bot.stop_polling()
+
     # ---- ---- #

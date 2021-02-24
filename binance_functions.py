@@ -8,7 +8,6 @@ class Binance(object):
     def __init__(self, api_key, secret_key):
         self.client = Client(api_key, secret_key)
         self.client.API_URL = 'https://testnet.binance.vision/api' #only for testing
-        #self.recvWindow = self.get_recvWindow(self.client)
 
     # ---- Account Info Commands --- #
     def get_account(self):

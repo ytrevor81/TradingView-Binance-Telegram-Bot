@@ -123,3 +123,16 @@ def cancel_order_message_filter(message):
     else:
         cancel_order_params[0] = symbol + "USDT"
     return cancel_order_params
+
+def help_message():
+    account = "- Check account: /account\n\n"
+    order_history = "- CSV of your order history for a given token:\n /orderhistory {symbol} (ex. /orderhistory eth)\n\n"
+    open_orders = "- Check all open orders for a given token:\n /openorders {symbol} (ex. /opensorders btc)\n\n"
+    market_order = "- Make a market order:\n /market {side} {amount} {symbol} ( ex. /market buy 0.01 eth )\n\n"
+    limit_order = "- Make a limit order:\n /limit {timeInForce} {side} {amount} {symbol} at {price} ( ex. /limit gtc sell 0.01 ethusdt at 1858 )\n\n"
+    stoploss_order = "- Make a stop loss order:\n /stoploss {timeInForce} {side} {amount} {symbol} at {price} stop at {stopLoss} ( ex. /stoploss gtc sell 0.1 btc at 55000 stop at 56000 )\n\n"
+    ticker = "- Check current price of token:\n /ticker {symbol}( ex. /ticker trx )\n\n"
+    cancel_order = "- Cancels an open order. *Call /openorders first to see the order IDs:\n /cancel {symbol} {orderId} ( ex. /cancel eth 6963 )\n\n"
+    block_tradingview = "- Temporarily block TradingView orders: /block\n\n"
+    unblock_tradingview = "- Unblock TradingView orders: /unblock"
+    return account + order_history + order_history + open_orders + market_order + limit_order + stoploss_order + ticker + cancel_order + block_tradingview + unblock_tradingview
