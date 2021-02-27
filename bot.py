@@ -16,6 +16,9 @@ class Bot(object):
         self.block_tradingview = False #if True, TradingView orders will be blocked
         self.bot_running = True
 
+        self.BOT_INTERVAL = 3
+        self.BOT_TIMEOUT = 30
+
         # ---- Initializing Functions --- #
         self.initial_chat_id_check() #checks if chat_id is already in the DB
         self.polling_thread = threading.Thread(target=self.all_bot_actions) #The bot will be polling for messages asynchronously as the rest of the app runs
@@ -266,11 +269,10 @@ class Bot(object):
     def polling(self):
         while self.bot_running:
             try:
-                self.bot.polling()
-            except requests.exceptions.ConnectTimeout:
-			             pass
-            except requests.exceptions.ReadTimeout:
-			             pass
+                self.bot.polling(none_stop=True, interval=self.BOT_INTERVAL, timeout=self.BOT_TIMEOUT)
+            except Exception as e:
+                self.bot.stop_polling()
+                sleep(self.BOT_TIMEOUT)
 
     def all_bot_actions(self):
         self.bot_commands(self.bot)
