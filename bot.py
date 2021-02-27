@@ -14,7 +14,7 @@ class Bot(object):
         self.general_error_message = "Incorrect syntax or symbol. Please see example below or see /help \n\n" # Add onto the end of this message the specific command syntax needed
         self.csv_file_name = None #this will automatically delete any csv file called on /orderhistory
         self.block_tradingview = False #if True, TradingView orders will be blocked
-        self.kill_command = False
+        self.bot_running = True
 
         # ---- Initializing Functions --- #
         self.initial_chat_id_check() #checks if chat_id is already in the DB
@@ -208,7 +208,7 @@ class Bot(object):
         def kill_app(message):
             ''' Block TradingView orders and raises an Exception, killing the current Bot thread '''
             self.block_tradingview = True
-            self.kill_app = True
+            self.bot_running = False
             self.bot.stop_polling()
             bot.send_message(0, message)
 
@@ -263,13 +263,10 @@ class Bot(object):
     # ---- ---- #
 
     # ---- Async Polling Setup ---- #
-    def async_polling(self):
-        while True:
+    def polling(self):
+        while self.bot_running:
             try:
-                if self.kill_command:
-                    return False
-                else:
-                    self.bot.polling()
+                self.bot.polling()
             except requests.exceptions.ConnectTimeout:
 			             pass
             except requests.exceptions.ReadTimeout:
@@ -278,7 +275,7 @@ class Bot(object):
     def all_bot_actions(self):
         self.bot_commands(self.bot)
         #self.bot.polling()
-        self.async_polling()
+        self.polling()
 
     def restart_async_polling(self):
         self.polling_thread = threading.Thread(target=self.all_bot_actions)
