@@ -135,4 +135,4 @@ def help_message():
     cancel_order = "- Cancels an open order. *Call /openorders first to see the order IDs:\n /cancel {symbol} {orderId} ( ex. /cancel eth 6963 )\n\n"
     block_tradingview = "- Temporarily block TradingView orders: /block\n\n"
     unblock_tradingview = "- Unblock TradingView orders: /unblock"
-    return account + order_history + order_history + open_orders + market_order + limit_order + stoploss_order + ticker + cancel_order + block_tradingview + unblock_tradingview
+    return account + order_history + open_orders + market_order + limit_order + stoploss_order + ticker + cancel_order + block_tradingview + unblock_tradingview

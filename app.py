@@ -1,11 +1,11 @@
 import json, config
-from bot import Bot
+from bot import MainBot
 from binance_functions import Binance
 from message_filter_functions import *
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-bot = Bot() #Handles all telegram communication
+bot = MainBot() #Handles all telegram communication
 
 
 ## ---- RECEIVE TRADINGVIEW WEBHOOK AND PLACE ORDER ---- ##
