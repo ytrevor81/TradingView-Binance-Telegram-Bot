@@ -40,13 +40,22 @@ You can change and add any variable you want, as long as it's in JSON format. An
 On TradingView, make sure to include the desired url you would like to send in the 'Webhook URL' input (ex: http://your.server.address/atbwebhook)
 
 
-## Telegram Messages
+## Telegram Messages and Commands
+
+###Commands
+1. /account - Check current account on Binance
+2. /help - Receive a notification of all valid commands the bot will process.
+3. /orderhistory {symbol} - Receive a CSV file of all orders made for a specific token (ex. /orderhistory btc)
+4. /openorders {symbol} - Checks all open orders for a specific token (ex. /openorders xrp)
+5. /market {side} {amount} {symbol} - Place a market order on Binance (ex. /market buy 0.01 eth)
+6. /limit {timeInForce} {side} {amount} {symbol} at {price} - Place a limit order on Binance (ex. /limit gtc sell 0.01 eth at 1800)
+7. /stoploss {timeInForce} {side} {amount} {symbol} at {price} stop at {stopLoss} - Place a stoploss limit order on Binance (ex. /stoploss gtc sell 0.1 btc at 55000 stop at 54900)
+8. /ticker {symbol} - Checks the current price of a given token (ex. /ticker btc)
+9. /cancel {symbol} {orderId} - Cancels an open order. It is recommended to call the command /openorders first, so that the user can copy and paste the order ID of a trade they would like to cancel. (ex. /cancel btc 6963)
+10. /block - Temporarily blocks automated TradingView orders. This does not block orders made via Telegram command.
+11. /unblock - Unblocks automated TradingView orders.
 
 ### Order confirmation: 
 
 ![Capture](https://user-images.githubusercontent.com/46886041/107135579-81addf80-692e-11eb-842e-4d84e6dc85cc.JPG)
 
-
-### Error message and denied order message:
-
-![fg](https://user-images.githubusercontent.com/46886041/107135597-99856380-692e-11eb-9db7-02326c6b1f53.JPG)
