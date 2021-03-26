@@ -37,7 +37,7 @@ Set up your TradingView alert to send a JSON message like this:
 
 You can change and add any variable you want, as long as it's in JSON format. Any additions, however, must be added to the Binance API call in <i>app.py</i> as well, because the code in <i>app.py</i> will read directly from this alert message. 
 
-On TradingView, make sure to include the desired url you would like to send in the 'Webhook URL' input (ex: http://your.server.address/atbwebhook)
+On TradingView, make sure to include the desired url you would like to send in the 'Webhook URL' input (ex: http://your.server.address/botwebhook)
 
 
 ## Telegram Bot
