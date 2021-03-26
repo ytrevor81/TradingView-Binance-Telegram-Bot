@@ -1,7 +1,7 @@
 # TradingView-Binance-Telegram-Bot
 Flask | Binance API | Telegram API | TradingView Webhook | JSON
 
-An automated trading bot connecting TradingView alerts to the Binance API, and sending order confirmations or errors to a Telegram user. The user can also send commands to the bot to make new trades, download trade history, cancel open trades, and a variety of other options! 
+An automated trading bot connecting TradingView alerts via webhook to the Binance API, and sending order confirmations or errors to a Telegram user. The user can also send commands to the bot to make new trades, download trade history, cancel open trades, and a variety of other options! 
 
 ## How to run the trading bot
 This bot is operated by Flask.
