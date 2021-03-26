@@ -42,7 +42,8 @@ On TradingView, make sure to include the desired url you would like to send in t
 
 ## Telegram Messages and Commands
 
-###Commands
+### Commands
+
 1. /account - Check current account on Binance
 2. /help - Receive a notification of all valid commands the bot will process.
 3. /orderhistory {symbol} - Receive a CSV file of all orders made for a specific token (ex. /orderhistory btc)
