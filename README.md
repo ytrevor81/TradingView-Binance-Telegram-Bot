@@ -40,7 +40,7 @@ You can change and add any variable you want, as long as it's in JSON format. An
 On TradingView, make sure to include the desired url you would like to send in the 'Webhook URL' input (ex: http://your.server.address/atbwebhook)
 
 
-## Telegram Messages and Commands
+## Telegram Bot
 
 ### Commands
 
