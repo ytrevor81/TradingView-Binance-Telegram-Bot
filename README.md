@@ -24,7 +24,7 @@ The user of this trading bot must make a <i>config.py</i> (or a .json file) that
 Set up your TradingView alert to send a JSON message like this:
 
 {
-	"passphrase": Your passphrase here,
+	"passphrase": "Your passphrase here",
 	"time": "{{timenow}}",
 	"exchange": "{{exchange}}",
 	"symbol": "{{ticker}}",
