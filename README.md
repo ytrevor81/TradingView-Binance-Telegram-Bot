@@ -12,7 +12,7 @@ This bot is operated by Flask.
 
 ## How does the trading bot work?
 There are four parts to this trading bot:
-1. Receives TradingView alerts via webhook, at the endpoint "/atbwebhook" (found in file <i>app.py</i>)
+1. Receives TradingView alerts via webhook, at the endpoint "/botwebhook" (found in file <i>app.py</i>)
 2. Send order to Binance API (found in file <i>app.py</i>)
 3. A Telegram messaging bot sends order confirmations from Binance API and error messages to the Telegram bot admin (found in file <i>bot.py</i>)
 4. Send Telegram commands to a Telegram bot connected to the main application.
