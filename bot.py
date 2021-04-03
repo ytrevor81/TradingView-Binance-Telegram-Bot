@@ -36,7 +36,7 @@ class MainBot(object):
         username = message.from_user.username
         user = db.user_check()
         if user == "None" and self.user_name_recorded == False:
-            db.save_username()
+            db.save_username(username)
             self.user_name_recorded = True
             return True
         elif user == username:
