@@ -1,12 +1,8 @@
 import sqlite3
 ''' Table name: user_info
     Columns:
-    1. chat_id: text
-    2. strategy_token: text
-    3. buy_price: integer
-    4. sell_price: integer
-    5. cancelled: text (True/False)
-    6. user: text'''
+    1. chat_id: integer
+    2. user: text'''
 
 
 class Database(object):
