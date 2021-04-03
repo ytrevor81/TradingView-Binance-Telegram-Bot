@@ -13,6 +13,13 @@ class Database(object):
     def __init__(self):
         self.conn = sqlite3.connect('db.sqlite')
         self.c = self.conn.cursor()
+        self.initialize_db()
+
+    def initialize_db(self):
+        '''Creates necessary tables if they do not exist'''
+        with self.conn:
+            self.c.execute("CREATE TABLE IF NOT EXISTS user_info(chat_id INTEGER, user TEXT)")
+            self.c.execute("INSERT INTO user_info (chat_id, user) VALUES (0, 'None')")
 
     def chat_id_check(self):
         ''' Only one chat can be initialized at a time by the owner of the bot '''
