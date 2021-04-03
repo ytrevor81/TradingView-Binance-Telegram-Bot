@@ -44,17 +44,18 @@ On TradingView, make sure to include the desired url you would like to send in t
 
 ### Commands
 
-1. /account - Check current account on Binance
+1. /start - Saves Chat Id and Username
 2. /help - Receive a notification of all valid commands the bot will process.
-3. /orderhistory {symbol} - Receive a CSV file of all orders made for a specific token (ex. /orderhistory btc)
-4. /openorders {symbol} - Checks all open orders for a specific token (ex. /openorders xrp)
-5. /market {side} {amount} {symbol} - Place a market order on Binance (ex. /market buy 0.01 eth)
-6. /limit {timeInForce} {side} {amount} {symbol} at {price} - Place a limit order on Binance (ex. /limit gtc sell 0.01 eth at 1800)
-7. /stoploss {timeInForce} {side} {amount} {symbol} at {price} stop at {stopLoss} - Place a stoploss limit order on Binance (ex. /stoploss gtc sell 0.1 btc at 55000 stop at 54900)
-8. /ticker {symbol} - Checks the current price of a given token (ex. /ticker btc)
-9. /cancel {symbol} {orderId} - Cancels an open order. It is recommended to call the command /openorders first, so that the user can copy and paste the order ID of a trade they would like to cancel. (ex. /cancel btc 6963)
-10. /block - Temporarily blocks automated TradingView orders. This does not block orders made via Telegram command.
-11. /unblock - Unblocks automated TradingView orders.
+3. /account - Check current account on Binance
+4. /orderhistory {symbol} - Receive a CSV file of all orders made for a specific token (ex. /orderhistory btc)
+5. /openorders {symbol} - Checks all open orders for a specific token (ex. /openorders xrp)
+6. /market {side} {amount} {symbol} - Place a market order on Binance (ex. /market buy 0.01 eth)
+7. /limit {timeInForce} {side} {amount} {symbol} at {price} - Place a limit order on Binance (ex. /limit gtc sell 0.01 eth at 1800)
+8. /stoploss {timeInForce} {side} {amount} {symbol} at {price} stop at {stopLoss} - Place a stoploss limit order on Binance (ex. /stoploss gtc sell 0.1 btc at 55000 stop at 54900)
+9. /ticker {symbol} - Checks the current price of a given token (ex. /ticker btc)
+10. /cancel {symbol} {orderId} - Cancels an open order. It is recommended to call the command /openorders first, so that the user can copy and paste the order ID of a trade they would like to cancel. (ex. /cancel btc 6963)
+11. /block - Temporarily blocks automated TradingView orders. This does not block orders made via Telegram command.
+12. /unblock - Unblocks automated TradingView orders.
 
 ### Order confirmation: 
 
