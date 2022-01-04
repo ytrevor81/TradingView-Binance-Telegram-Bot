@@ -33,7 +33,7 @@ class MainBot(object):
 
     def correct_user(self, message, db):
         ''' Check if correct user '''
-        username = message.from_user.username
+        username = message.from_user.first_name
         user = db.user_check()
         if user == "None" and self.user_name_recorded == False:
             db.save_username(username)
